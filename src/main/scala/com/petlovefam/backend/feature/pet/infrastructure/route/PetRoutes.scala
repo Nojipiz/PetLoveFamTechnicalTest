@@ -4,23 +4,32 @@ import com.petlovefam.backend.feature.pet.application.PetService
 import com.petlovefam.graphql.Types
 import zio.*
 import com.petlovefam.backend.feature.pet.domain.entity.Pet
+import com.petlovefam.backend.feature.pet.application.request.CreatePetRequest
+import com.petlovefam.backend.feature.pet.infrastructure.route.mapper.Mapper
+import com.petlovefam.backend.feature.pet_owner.application.PetOwnerService
 import io.github.arainko.ducktape.*
 
-class PetRoutes(petService: PetService):
+class PetRoutes(petService: PetService, petOwnerService: PetOwnerService):
 
-  def getPets(): Task[List[Types.Pet]] =
-    petService.getPets.map(_.map(_.into[Types.Pet].transform()))
-
-  def createPet(createPetArgs: Types.MutationCreatePetArgs): Task[Types.Pet] =
-    petService
-      .createPet(
-        name = createPetArgs.name,
-        breed = createPetArgs.breed,
-        birthDate = createPetArgs.birthDate,
-        picture = createPetArgs.picture
+  def getPets(queryPetsArgs: Types.QueryPetsArgs): Task[List[Types.Pet]] =
+    petService.getPets.map(_.map { pet =>
+      Mapper.toGraphQL(
+        pet,
+        petOwnerService.getPetOwner(petOwnerId = pet.petOwnerId).someOrFailException.map(Mapper.toGraphQL)
       )
-      .map(_.into[Types.Pet].transform())
+    })
+
+  def createPet(createPetArgs: Types.MutationCreatePetArgs): Task[Types.Pet] = {
+    petService
+      .createPet(createPetArgs.into[CreatePetRequest].transform())
+      .map { pet =>
+        Mapper.toGraphQL(
+          pet,
+          petOwnerService.getPetOwner(petOwnerId = pet.petOwnerId).someOrFailException.map(Mapper.toGraphQL)
+        )
+      }
+  }
 
 object PetRoutes:
-  def live: ZLayer[PetService, Nothing, PetRoutes] =
-    ZLayer.fromFunction(PetRoutes(_))
+  def live: ZLayer[PetService & PetOwnerService, Nothing, PetRoutes] =
+    ZLayer.fromFunction(PetRoutes(_, _))

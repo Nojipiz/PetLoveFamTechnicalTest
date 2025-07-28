@@ -8,7 +8,9 @@ import com.petlovefam.backend.feature.veterinary_appointment.infrastructure.rout
 
 class VeterinaryAppointmentRoutes(appointmentService: VeterinaryAppointmentService):
 
-  def getVeterinaryAppointments(): Task[List[Types.VeterinaryAppointment]] =
+  def getVeterinaryAppointments(
+      queryVeterinaryAppointmentArgs: Types.QueryVeterinaryAppointmentsArgs
+  ): Task[List[Types.VeterinaryAppointment]] =
     appointmentService.getAppointments.map(_.map(Mapper.toGraphQL))
 
   def createVeterinaryAppointment(

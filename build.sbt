@@ -17,6 +17,7 @@ lazy val root = project
           .packageName("com.petlovefam.graphql")
           .effect("Task")
           .imports("zio.Task")
+          .scalarMapping(("ID", "String"))
       )
     )
   )

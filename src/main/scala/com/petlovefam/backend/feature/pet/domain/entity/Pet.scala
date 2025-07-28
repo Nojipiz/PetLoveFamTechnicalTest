@@ -2,8 +2,9 @@ package com.petlovefam.backend.feature.pet.domain.entity
 
 case class Pet(
     id: String,
+    petOwnerId: String,
     name: String,
     breed: String,
     birthDate: String,
-    picture: Option[String] = None
+    pictureUrl: Option[String] = None
 )

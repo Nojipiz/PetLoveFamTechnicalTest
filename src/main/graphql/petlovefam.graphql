@@ -1,19 +1,52 @@
+directive @lazy on FIELD_DEFINITION
+
+scalar ID
+
 type Query {
+  """
+  Query all the pet owners.
+  """
   petOwners: [PetOwner!]!
-  pets: [Pet!]!
-  veterinaryAppointments: [VeterinaryAppointment!]!
+
+  """
+  Query all the pets.
+  Can be filtered based on pet owner.
+  """
+  pets(petOwnerId: ID): [Pet!]!
+
+  """
+  Query all the appointments.
+  Can be filtered based on pet owner or incoming appointments.
+  """
+  veterinaryAppointments(
+    petOwnerId: ID
+    incommingOnly: Boolean = false
+  ): [VeterinaryAppointment!]!
 }
 
 type Mutation {
+  """
+  Create a new pet owner.
+  Email must be unique.
+  """
   createPetOwner(name: String!, email: String!): PetOwner!
+
+  """
+  Create a new pet.
+  """
   createPet(
+    petOwnerId: ID!
     name: String!
     breed: String!
     birthDate: String!
-    picture: String
+    pictureUrl: String
   ): Pet!
+
+  """
+  Create a new veterinary appointment.
+  """
   createVeterinaryAppointment(
-    petId: String!
+    petId: ID!
     date: String!
     type: AppointmentType!
   ): VeterinaryAppointment!
@@ -29,10 +62,12 @@ type PetOwner {
 
 type Pet {
   id: String!
+  petOwnerId: String!
   name: String!
   breed: String!
   birthDate: String!
-  picture: String
+  pictureUrl: String
+  owner: PetOwner! @lazy
 }
 
 type VeterinaryAppointment {

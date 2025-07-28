@@ -13,6 +13,10 @@ import zio.{ZIO, ZLayer}
 import com.petlovefam.backend.feature.pet_owner.infrastructure.route.PetOwnerRoutes
 import com.petlovefam.backend.feature.pet.infrastructure.route.PetRoutes
 import com.petlovefam.backend.feature.veterinary_appointment.infrastructure.route.VeterinaryAppointmentRoutes
+import caliban.CalibanError._
+import caliban.Value.StringValue
+import caliban.ResponseValue
+import caliban.ResponseValue.ObjectValue
 
 class GraphQLAPI private (
     petOwnerRoutes: PetOwnerRoutes,
@@ -22,8 +26,8 @@ class GraphQLAPI private (
 
   private val queries = Query(
     petOwners = petOwnerRoutes.getPetOwners(),
-    pets = petRoutes.getPets(),
-    veterinaryAppointments = veterinaryAppointmentRoutes.getVeterinaryAppointments()
+    pets = petRoutes.getPets,
+    veterinaryAppointments = veterinaryAppointmentRoutes.getVeterinaryAppointments
   )
 
   private val mutations = Mutation(
@@ -33,8 +37,7 @@ class GraphQLAPI private (
   )
 
   val api: GraphQL[Any] =
-    graphQL(RootResolver(queryResolver = queries, mutationResolver = mutations))
-      @@ printErrors
+    graphQL(RootResolver(queryResolver = queries, mutationResolver = mutations)) @@ printErrors
 
   def run(): zio.Task[Unit] = for {
     interpreter <- api.interpreter.map(QuickAdapter(_).handlers)

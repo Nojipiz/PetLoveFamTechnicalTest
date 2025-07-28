@@ -16,6 +16,10 @@ class PetOwnerRepositoryImpl(
   override def insert(petOwner: PetOwner): Task[PetOwner] = run(
     query[PetOwner].insertValue(lift(petOwner))
   ).as(petOwner)
+
+  override def findById(petOwnerId: String): Task[Option[PetOwner]] = run(
+    query[PetOwner].filter(_.id == lift(petOwnerId)).take(1)
+  ).map(_.headOption)
 }
 
 object PetOwnerRepositoryImpl {

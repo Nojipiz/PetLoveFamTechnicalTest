@@ -4,18 +4,20 @@ import com.petlovefam.backend.feature.pet.domain.entity.Pet
 import com.petlovefam.backend.feature.pet.domain.repository.PetRepository
 import zio.{Task, ZIO, ZLayer}
 import java.util.UUID
+import com.petlovefam.backend.feature.pet.application.request.CreatePetRequest
 
 class PetService private (petRepository: PetRepository[Task]) {
 
   def getPets: Task[List[Pet]] = petRepository.findAll()
 
-  def createPet(name: String, breed: String, birthDate: String, picture: Option[String] = None): Task[Pet] =
+  def createPet(createPetRequest: CreatePetRequest): Task[Pet] =
     val pet = Pet(
       id = UUID.randomUUID().toString(),
-      name = name,
-      breed = breed,
-      birthDate = birthDate,
-      picture = picture
+      petOwnerId = createPetRequest.petOwnerId,
+      name = createPetRequest.name,
+      breed = createPetRequest.breed,
+      birthDate = createPetRequest.birthDate,
+      pictureUrl = createPetRequest.pictureUrl
     )
     petRepository.insert(pet)
 }

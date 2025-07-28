@@ -11,10 +11,12 @@ CREATE TABLE pet_owner (
 -- Create pet table
 CREATE TABLE pet (
     id TEXT PRIMARY KEY NOT NULL,
+    pet_owner_id TEXT NOT NULL,
     name TEXT NOT NULL,
     breed TEXT NOT NULL,
     birth_date TEXT NOT NULL,
-    picture TEXT
+    picture_url TEXT,
+    FOREIGN KEY (pet_owner_id) REFERENCES pet_owner(id) ON DELETE CASCADE
 );
 
 -- Create veterinary_appointment table
