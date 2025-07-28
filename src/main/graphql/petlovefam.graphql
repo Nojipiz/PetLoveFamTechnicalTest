@@ -1,0 +1,48 @@
+type Query {
+  petOwners: [PetOwner!]!
+  pets: [Pet!]!
+  veterinaryAppointments: [VeterinaryAppointment!]!
+}
+
+type Mutation {
+  createPetOwner(name: String!, email: String!): PetOwner!
+  createPet(
+    name: String!
+    breed: String!
+    birthDate: String!
+    picture: String
+  ): Pet!
+  createVeterinaryAppointment(
+    petId: String!
+    date: String!
+    type: AppointmentType!
+  ): VeterinaryAppointment!
+}
+
+# --------------------- Output types ------------------------
+
+type PetOwner {
+  id: String!
+  name: String!
+  email: String!
+}
+
+type Pet {
+  id: String!
+  name: String!
+  breed: String!
+  birthDate: String!
+  picture: String
+}
+
+type VeterinaryAppointment {
+  id: String!
+  petId: String!
+  date: String!
+  type: AppointmentType!
+}
+
+enum AppointmentType {
+  CONSULTATION
+  VACCINATION
+}
