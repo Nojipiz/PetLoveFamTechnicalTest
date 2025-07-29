@@ -8,11 +8,10 @@ import com.petlovefam.backend.feature.pet_owner.domain.entity.PetOwner
 
 private[route] object Mapper:
 
-  def toGraphQL(pet: Pet, owner: Task[Types.PetOwner]): Types.Pet = {
+  def toGraphQL(pet: Pet, owner: Task[Types.PetOwner]): Types.Pet =
     pet
       .into[Types.Pet]
       .transform(Field.const(_.owner, owner))
-  }
 
   def toGraphQL(petOwner: PetOwner): Types.PetOwner =
     petOwner

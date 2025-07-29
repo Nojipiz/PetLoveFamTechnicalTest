@@ -6,7 +6,7 @@ import zio.{Task, ZIO, ZLayer}
 import java.util.UUID
 import com.petlovefam.backend.feature.pet.application.request.CreatePetRequest
 
-class PetService private (petRepository: PetRepository[Task]) {
+class PetService private (petRepository: PetRepository[Task]):
 
   def getPets: Task[List[Pet]] = petRepository.findAll()
 
@@ -20,9 +20,7 @@ class PetService private (petRepository: PetRepository[Task]) {
       pictureUrl = createPetRequest.pictureUrl
     )
     petRepository.insert(pet)
-}
 
-object PetService {
+object PetService:
   val live: ZLayer[PetRepository[Task], Nothing, PetService] =
     ZLayer.fromFunction(new PetService(_))
-}

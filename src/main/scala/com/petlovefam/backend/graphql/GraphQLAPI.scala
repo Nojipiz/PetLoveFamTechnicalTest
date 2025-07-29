@@ -1,8 +1,8 @@
 package com.petlovefam.backend.graphql
 
-import caliban.wrappers.Wrappers._
-import caliban.schema.ArgBuilder.auto._
-import caliban.schema.Schema.auto._
+import caliban.wrappers.Wrappers.*
+import caliban.schema.ArgBuilder.auto.*
+import caliban.schema.Schema.auto.*
 import com.petlovefam.backend.di.DependencyInjection
 import caliban.*
 import com.petlovefam.backend.feature.pet_owner.application.PetOwnerService
@@ -13,7 +13,7 @@ import zio.{ZIO, ZLayer}
 import com.petlovefam.backend.feature.pet_owner.infrastructure.route.PetOwnerRoutes
 import com.petlovefam.backend.feature.pet.infrastructure.route.PetRoutes
 import com.petlovefam.backend.feature.veterinary_appointment.infrastructure.route.VeterinaryAppointmentRoutes
-import caliban.CalibanError._
+import caliban.CalibanError.*
 import caliban.Value.StringValue
 import caliban.ResponseValue
 import caliban.ResponseValue.ObjectValue
@@ -39,7 +39,7 @@ class GraphQLAPI private (
   val api: GraphQL[Any] =
     graphQL(RootResolver(queryResolver = queries, mutationResolver = mutations)) @@ printErrors
 
-  def run(): zio.Task[Unit] = for {
+  def run(): zio.Task[Unit] = for
     interpreter <- api.interpreter.map(QuickAdapter(_).handlers)
     graphiQLRequestHandler = GraphiQLHandler.handler(
       apiPath = "/api/graphql",
@@ -51,7 +51,7 @@ class GraphQLAPI private (
       Method.POST / "upload" / "graphql" -> interpreter.upload
     )
     _ <- app.serve[Any].provide(Server.defaultWithPort(8080))
-  } yield ()
+  yield ()
 
 object GraphQLAPI:
   val live: ZLayer[DependencyInjection.Routes, Nothing, GraphQLAPI] = ZLayer.fromFunction(new GraphQLAPI(_, _, _))

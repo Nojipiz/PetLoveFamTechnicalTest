@@ -12,7 +12,7 @@ import javax.sql.DataSource
 import scala.annotation.migration
 import scala.jdk.CollectionConverters.*
 
-object DBMigrator {
+object DBMigrator:
 
   def migrate(datasource: DataSource): Task[Unit] =
     ZIO
@@ -24,4 +24,3 @@ object DBMigrator {
           ZIO.fail(new Throwable("Something goes wrong in database migraton"))
       }
       .onError(cause => ZIO.logErrorCause("Database migration has failed", cause))
-}

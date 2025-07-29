@@ -8,7 +8,7 @@ import zio.{Task, ZLayer}
 
 class PetOwnerRepositoryImpl(
     quill: Quill.Sqlite[SnakeCase]
-) extends PetOwnerRepository[Task] {
+) extends PetOwnerRepository[Task]:
   import quill.*
 
   override def findAll(): Task[List[PetOwner]] = run(query[PetOwner])
@@ -20,8 +20,6 @@ class PetOwnerRepositoryImpl(
   override def findById(petOwnerId: String): Task[Option[PetOwner]] = run(
     query[PetOwner].filter(_.id == lift(petOwnerId)).take(1)
   ).map(_.headOption)
-}
 
-object PetOwnerRepositoryImpl {
+object PetOwnerRepositoryImpl:
   val live = ZLayer.fromFunction(new PetOwnerRepositoryImpl(_))
-}

@@ -10,7 +10,7 @@ import com.petlovefam.backend.feature.veterinary_appointment.domain.entity.Appoi
 
 class VeterinaryAppointmentRepositoryImpl(
     quill: Quill.Sqlite[SnakeCase]
-) extends VeterinaryAppointmentRepository[Task] {
+) extends VeterinaryAppointmentRepository[Task]:
   import quill.*
 
   implicit val encodeType: MappedEncoding[AppointmentType, String] =
@@ -23,9 +23,7 @@ class VeterinaryAppointmentRepositoryImpl(
   override def insert(appointment: VeterinaryAppointment): Task[VeterinaryAppointment] = run(
     query[VeterinaryAppointment].insertValue(lift(appointment))
   ).as(appointment)
-}
 
-object VeterinaryAppointmentRepositoryImpl {
+object VeterinaryAppointmentRepositoryImpl:
 
   val live = ZLayer.fromFunction(new VeterinaryAppointmentRepositoryImpl(_))
-}

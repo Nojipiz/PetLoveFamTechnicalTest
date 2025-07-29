@@ -6,7 +6,7 @@ import zio.*
 
 import javax.sql.DataSource
 
-object DBSetup {
+object DBSetup:
 
   private def availableSourceSchedule(sourceName: String, sourcePath: Option[String] = None) = Schedule
     .fixed(2000.milliseconds)
@@ -22,4 +22,3 @@ object DBSetup {
 
   val liveSqlLayer: ZLayer[DataSource, Throwable, Quill.Sqlite[SnakeCase]] =
     liveDataSourceLayer >>> Quill.Sqlite.fromNamingStrategy(SnakeCase)
-}

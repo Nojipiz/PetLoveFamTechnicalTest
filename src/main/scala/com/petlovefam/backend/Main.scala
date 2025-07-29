@@ -10,18 +10,17 @@ import javax.sql.DataSource
 object Main extends ZIOAppDefault:
 
   val main: Task[Unit] = {
-    for {
+    for
       datasource <- ZIO.service[DataSource]
       _ <- DBMigrator.migrate(datasource)
       graphQL <- ZIO.service[GraphQLAPI]
       _ <- graphQL.run()
-    } yield ()
+    yield ()
   }.provideSomeLayer(DependencyInjection.liveGraphQL)
     .provideLayer(DBSetup.liveDataSourceLayer)
 
-  override def run: ZIO[ZIOAppArgs & Scope, Any, Unit] = {
-    for {
+  override def run: ZIO[ZIOAppArgs & Scope, Any, Unit] =
+    for
       n <- Console.printLine("Starting application...")
       _ <- main
-    } yield ()
-  }
+    yield ()

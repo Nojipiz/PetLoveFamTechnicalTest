@@ -5,7 +5,7 @@ import com.petlovefam.backend.feature.pet_owner.domain.repository.PetOwnerReposi
 import zio.{Task, ZIO, ZLayer}
 import java.util.UUID
 
-class PetOwnerService private (petOwnerRepository: PetOwnerRepository[Task]) {
+class PetOwnerService private (petOwnerRepository: PetOwnerRepository[Task]):
 
   def getPetOwners: Task[List[PetOwner]] = petOwnerRepository.findAll()
 
@@ -18,9 +18,7 @@ class PetOwnerService private (petOwnerRepository: PetOwnerRepository[Task]) {
       email = email
     )
     petOwnerRepository.insert(petOwner)
-}
 
-object PetOwnerService {
+object PetOwnerService:
   val live: ZLayer[PetOwnerRepository[Task], Nothing, PetOwnerService] =
     ZLayer.fromFunction(new PetOwnerService(_))
-}

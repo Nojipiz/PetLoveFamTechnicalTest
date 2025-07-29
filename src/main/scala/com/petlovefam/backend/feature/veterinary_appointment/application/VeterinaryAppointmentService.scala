@@ -5,7 +5,7 @@ import com.petlovefam.backend.feature.veterinary_appointment.domain.repository.V
 import zio.{Task, ZIO, ZLayer}
 import java.util.UUID
 
-class VeterinaryAppointmentService private (appointmentRepository: VeterinaryAppointmentRepository[Task]) {
+class VeterinaryAppointmentService private (appointmentRepository: VeterinaryAppointmentRepository[Task]):
 
   def getAppointments: Task[List[VeterinaryAppointment]] = appointmentRepository.findAll()
 
@@ -17,9 +17,7 @@ class VeterinaryAppointmentService private (appointmentRepository: VeterinaryApp
       `type` = appointmentType
     )
     appointmentRepository.insert(appointment)
-}
 
-object VeterinaryAppointmentService {
+object VeterinaryAppointmentService:
   val live: ZLayer[VeterinaryAppointmentRepository[Task], Nothing, VeterinaryAppointmentService] =
     ZLayer.fromFunction(new VeterinaryAppointmentService(_))
-}
