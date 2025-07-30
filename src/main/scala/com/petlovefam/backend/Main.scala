@@ -9,7 +9,7 @@ import javax.sql.DataSource
 
 object Main extends ZIOAppDefault:
 
-  val main: Task[Unit] = {
+  private val main: Task[Unit] = {
     for
       datasource <- ZIO.service[DataSource]
       _ <- DBMigrator.migrate(datasource)
@@ -20,7 +20,4 @@ object Main extends ZIOAppDefault:
     .provideLayer(DBSetup.liveDataSourceLayer)
 
   override def run: ZIO[ZIOAppArgs & Scope, Any, Unit] =
-    for
-      n <- Console.printLine("Starting application...")
-      _ <- main
-    yield ()
+    Console.printLine("Starting application...") *> main

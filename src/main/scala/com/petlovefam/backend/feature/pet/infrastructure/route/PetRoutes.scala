@@ -18,7 +18,7 @@ class PetRoutes(petService: PetService, petOwnerService: PetOwnerService):
         Mapper.toGraphQL(
           pet,
           petOwnerService
-            .getPetOwner(petOwnerId = pet.petOwnerId)
+            .getPetOwnerById(petOwnerId = pet.petOwnerId)
             .someOrFailException
             .map(Mapper.toGraphQL)
         )
@@ -31,7 +31,7 @@ class PetRoutes(petService: PetService, petOwnerService: PetOwnerService):
       pet = Mapper.toGraphQL(
         createdPet,
         petOwnerService
-          .getPetOwner(petOwnerId = createdPet.petOwnerId)
+          .getPetOwnerById(petOwnerId = createdPet.petOwnerId)
           .someOrFailException
           .map(Mapper.toGraphQL)
       )

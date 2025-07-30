@@ -9,7 +9,7 @@ class PetOwnerService private (petOwnerRepository: PetOwnerRepository[Task]):
 
   def getPetOwners: Task[List[PetOwner]] = petOwnerRepository.findAll()
 
-  def getPetOwner(petOwnerId: String): Task[Option[PetOwner]] = petOwnerRepository.findById(petOwnerId)
+  def getPetOwnerById(petOwnerId: String): Task[Option[PetOwner]] = petOwnerRepository.findById(petOwnerId)
 
   def createPetOwner(name: String, email: String): Task[PetOwner] =
     val petOwner = PetOwner(

@@ -5,13 +5,22 @@ import com.petlovefam.graphql.Types
 import zio.*
 import com.petlovefam.backend.feature.veterinary_appointment.domain.entity.VeterinaryAppointment
 import com.petlovefam.backend.feature.veterinary_appointment.infrastructure.route.mapper.Mapper
+import com.petlovefam.backend.feature.pet.application.PetService
+import com.petlovefam.backend.feature.pet_owner.application.PetOwnerService
 
-class VeterinaryAppointmentRoutes(appointmentService: VeterinaryAppointmentService):
+class VeterinaryAppointmentRoutes(
+    appointmentService: VeterinaryAppointmentService,
+    petService: PetService,
+    petOwnerService: PetOwnerService
+):
 
   def getVeterinaryAppointments(
       queryVeterinaryAppointmentArgs: Types.QueryVeterinaryAppointmentsArgs
   ): Task[List[Types.VeterinaryAppointment]] =
-    appointmentService.getAppointments.map(_.map(Mapper.toGraphQL))
+    val getIncommingOnly = queryVeterinaryAppointmentArgs.incommingOnly.getOrElse(false)
+    appointmentService
+      .getAppointments(getIncommingOnly)
+      .map(_.map(transformToGraphQL))
 
   def createVeterinaryAppointment(
       createAppointmentArgs: Types.MutationCreateVeterinaryAppointmentArgs
@@ -19,11 +28,24 @@ class VeterinaryAppointmentRoutes(appointmentService: VeterinaryAppointmentServi
     appointmentService
       .createAppointment(
         petId = createAppointmentArgs.petId,
-        date = createAppointmentArgs.date,
+        rawDate = createAppointmentArgs.date,
         appointmentType = Mapper.fromGraphQL(createAppointmentArgs.`type`)
       )
-      .map(Mapper.toGraphQL)
+      .map(transformToGraphQL)
+
+  private def transformToGraphQL(veterinaryAppointment: VeterinaryAppointment): Types.VeterinaryAppointment =
+    val pet = petService
+      .getPetById(veterinaryAppointment.petId)
+      .someOrFailException
+      .map { pet =>
+        val petOwner = petOwnerService
+          .getPetOwnerById(petOwnerId = pet.petOwnerId)
+          .someOrFailException
+          .map(Mapper.toGraphQL)
+        Mapper.toGraphQL(pet, petOwner)
+      }
+    Mapper.toGraphQL(veterinaryAppointment, pet)
 
 object VeterinaryAppointmentRoutes:
-  def live: ZLayer[VeterinaryAppointmentService, Nothing, VeterinaryAppointmentRoutes] =
-    ZLayer.fromFunction(VeterinaryAppointmentRoutes(_))
+  def live: ZLayer[VeterinaryAppointmentService & PetOwnerService & PetService, Nothing, VeterinaryAppointmentRoutes] =
+    ZLayer.fromFunction(VeterinaryAppointmentRoutes(_, _, _))

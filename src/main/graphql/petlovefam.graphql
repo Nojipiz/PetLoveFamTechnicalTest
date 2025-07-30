@@ -1,6 +1,7 @@
 directive @lazy on FIELD_DEFINITION
 
 scalar ID
+scalar Date
 
 type Query {
   """
@@ -73,8 +74,13 @@ type Pet {
 type VeterinaryAppointment {
   id: String!
   petId: String!
-  date: String!
+  """
+  Format: YYYY-MM-DDTHH:mm:ss
+  Example: 2024-01-15T10:00:00
+  """
+  date: Date!
   type: AppointmentType!
+  pet: Pet! @lazy
 }
 
 enum AppointmentType {

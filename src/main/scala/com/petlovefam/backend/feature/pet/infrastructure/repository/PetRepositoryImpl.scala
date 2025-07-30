@@ -21,5 +21,9 @@ class PetRepositoryImpl(
     query[Pet].insertValue(lift(pet))
   ).as(pet)
 
+  override def findById(id: String): Task[Option[Pet]] = run(
+    query[Pet].filter(_.id == lift(id))
+  ).map(_.headOption)
+
 object PetRepositoryImpl:
   val live = ZLayer.fromFunction(new PetRepositoryImpl(_))

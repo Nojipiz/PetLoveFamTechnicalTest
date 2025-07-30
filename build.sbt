@@ -1,10 +1,11 @@
-import Dependencies._
+import Dependencies.*
 import _root_.caliban.tools.Codegen
 
 val globalScalaVersion = "3.3.6"
 ThisBuild / scalaVersion := globalScalaVersion
 ThisBuild / semanticdbEnabled := true
 ThisBuild / semanticdbVersion := "4.9.9"
+ThisBuild / scalacOptions := Seq("-Xmax-inlines", "50")
 
 lazy val root = project
   .in(file("."))
@@ -17,7 +18,7 @@ lazy val root = project
           .packageName("com.petlovefam.graphql")
           .effect("Task")
           .imports("zio.Task")
-          .scalarMapping(("ID", "String"))
+          .scalarMapping(("ID", "String"), ("Date", "java.time.LocalDateTime"))
       )
     )
   )

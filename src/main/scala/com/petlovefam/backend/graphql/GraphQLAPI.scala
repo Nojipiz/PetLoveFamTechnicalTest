@@ -17,6 +17,7 @@ import caliban.CalibanError.*
 import caliban.Value.StringValue
 import caliban.ResponseValue
 import caliban.ResponseValue.ObjectValue
+import com.petlovefam.backend.graphql.GraphQLAPI.withErrorCodeExtensions
 
 class GraphQLAPI private (
     petOwnerRoutes: PetOwnerRoutes,
@@ -40,7 +41,7 @@ class GraphQLAPI private (
     graphQL(RootResolver(queryResolver = queries, mutationResolver = mutations)) @@ printErrors
 
   def run(): zio.Task[Unit] = for
-    interpreter <- api.interpreter.map(QuickAdapter(_).handlers)
+    interpreter <- api.interpreter.map(withErrorCodeExtensions).map(QuickAdapter(_).handlers)
     graphiQLRequestHandler = GraphiQLHandler.handler(
       apiPath = "/api/graphql",
       wsPath = None
@@ -55,3 +56,19 @@ class GraphQLAPI private (
 
 object GraphQLAPI:
   val live: ZLayer[DependencyInjection.Routes, Nothing, GraphQLAPI] = ZLayer.fromFunction(new GraphQLAPI(_, _, _))
+
+  def withErrorCodeExtensions[R](
+      interpreter: GraphQLInterpreter[R, CalibanError]
+  ): GraphQLInterpreter[R, CalibanError] = interpreter.mapError {
+    case err @ ExecutionError(_, _, _, Some(throwable: Throwable), _) =>
+      err.copy(
+        msg = throwable.getMessage(),
+        extensions = Some(ObjectValue(List(("errorCode", StringValue(throwable.getMessage())))))
+      )
+    case err: ExecutionError =>
+      err.copy(extensions = Some(ObjectValue(List(("errorCode", StringValue("EXECUTION_ERROR"))))))
+    case err: ValidationError =>
+      err.copy(extensions = Some(ObjectValue(List(("errorCode", StringValue("VALIDATION_ERROR"))))))
+    case err: ParsingError =>
+      err.copy(extensions = Some(ObjectValue(List(("errorCode", StringValue("PARSING_ERROR"))))))
+  }
